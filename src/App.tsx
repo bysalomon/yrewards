@@ -6,7 +6,7 @@ import {Landing,InfoPage} from './pages/Landing';
 import {Login,Invitation,AdminMfa} from './pages/Auth';
 import {MemberLayout,Dashboard,WalletPage} from './pages/Member';
 import {ResearchDay} from './pages/Research';
-import {MemberClub} from './pages/Club';
+import {MemberClub,CourseView} from './pages/Club';
 import {MyProfile,MemberSettings} from './pages/Account';
 import {AdminPage} from './pages/Admin';
 function Protected({adminOnly=false,children}:{adminOnly?:boolean;children:React.ReactNode}){
@@ -28,6 +28,7 @@ export function App(){return <>
    <Route index element={<Dashboard/>}/>
    <Route path="tasks/:day" element={<ResearchDay/>}/>
    <Route path="club" element={<MemberClub/>}/>
+   <Route path="club/:courseId" element={<CourseView/>}/>
    <Route path="profile" element={<MyProfile/>}/>
    <Route path="settings" element={<MemberSettings/>}/>
    <Route path="wallet" element={<WalletPage/>}/>

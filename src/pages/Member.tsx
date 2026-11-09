@@ -65,6 +65,7 @@ export function MemberLayout({adminArea=false}:{adminArea?:boolean}){
   </aside>
   <div className="workBody"><header className="topbar"><button className="hamburger" aria-label="Open menu" onClick={()=>setOpen(true)}><Menu/></button>
    <span className="breadcrumb">YVRewards <span>/</span> {adminArea?'Administration':'My workspace'}</span>
+   <Link className="mobileTopBrand" to={adminArea?'/admin':'/app'} aria-label="YVRewards home"><Brand/></Link>
    <div className="topRight"><span className="onlineDot"/> <span className="topPresence">Research member</span><div className="avatar small">{profile?.username?.[0]?.toUpperCase()||'Y'}</div></div>
   </header><main className="page"><Outlet/></main></div>
  </div>
@@ -72,7 +73,7 @@ export function MemberLayout({adminArea=false}:{adminArea?:boolean}){
 export function Dashboard(){
  const {data,loading,error,refresh}=useMemberData();const [page,setPage]=useState(1);
  const [now,setNow]=useState(Date.now());
- useEffect(()=>{const timer=window.setInterval(()=>setNow(Date.now()),10000);return()=>clearInterval(timer)},[]);
+ useEffect(()=>{const timer=window.setInterval(()=>setNow(Date.now()),1000);return()=>clearInterval(timer)},[]);
  if(loading)return <div className="loading">Loading your YVRewards workspace…</div>;
  if(error||!data)return <div className="error">Could not load your workspace. {error}<button onClick={()=>void refresh()}>Try again</button></div>;
  const {day,wallet,feedback,tasks,completions,profile,watches}=data;
@@ -105,11 +106,13 @@ export function Dashboard(){
    <div className="dayCardHeader"><span className="dayIcon">{done?<Check size={20}/>:locked?<LockKeyhole size={19}/>:<Play size={20}/>}</span><span className={'statusPill '+(unlocked?'open':'')}>{label}</span></div>
    <span className="dayLabel">DAY {String(n).padStart(2,'0')}</span>
    <h3>{n===30?'Final review day':n===1?'Your first impressions':'Daily brand reviews'}</h3>
-   <p>{current&&!eligible?waitLabel(day.unlocks_at):present.length+' '+(present.length===1?'video':'videos')+' · '+money(present.reduce((a,t)=>a+t.reward_cents,0))+' total'}</p>
-   <div className="dayCardFooter">{done?present.length+' videos reviewed':unlocked?reviewed+' of '+present.length+' reviewed':'Complete previous days'} <ArrowRight size={18}/></div>
+   {current&&!eligible?<div className="dayCountdown"><span><span className="countdownPulse"/> NEXT RESEARCH OPENS IN</span><strong aria-live="off">{waitLabel(day.unlocks_at,now)}</strong></div>:
+    <p>{present.length+' '+(present.length===1?'video':'videos')+' · '+money(present.reduce((a,t)=>a+t.reward_cents,0))+' total'}</p>}
+   <div className="dayCardFooter">{done?present.length+' videos reviewed':unlocked?reviewed+' of '+present.length+' reviewed':current?'Unlocks after countdown':'Complete previous days'} <ArrowRight size={18}/></div>
   </Link>})}</div>
- <div className="pagination"><button disabled={page===1} onClick={()=>setPage(p=>p-1)}><ArrowLeft size={16}/> Previous</button><span>Page {page} of 4</span>
- <button disabled={page===4} onClick={()=>setPage(p=>p+1)}>Next <ArrowRight size={16}/></button></div>
+ <nav className="pagination" aria-label="Task pages"><button type="button" disabled={page===1} onClick={()=>setPage(p=>Math.max(1,p-1))}><ArrowLeft size={16}/> Previous</button>
+ <div className="pageNumbers">{[1,2,3,4].map(n=><button key={n} type="button" className={n===page?'selected':''} onClick={()=>setPage(n)} aria-label={'Go to page '+n} aria-current={n===page?'page':undefined}>{n}</button>)}</div>
+ <button type="button" disabled={page===4} onClick={()=>setPage(p=>Math.min(4,p+1))}>Next <ArrowRight size={16}/></button></nav>
  <div className="disclaimerPanel"><ShieldAlert size={20}/><p>YVRewards is independent of YouTube. YouTube embeds are optional references, and rewards are only for eligible research feedback — never for viewing, liking or other YouTube engagement.</p></div>
  </>;
 }

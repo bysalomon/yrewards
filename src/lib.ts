@@ -5,7 +5,13 @@ export const configured=Boolean(url&&key&&url.startsWith('https://'));
 export const supabase=createClient(url||'https://unconfigured.supabase.co',key||'placeholder',{auth:{persistSession:true,autoRefreshToken:true}});
 export const money=(cents:number|null|undefined)=>'$'+((cents||0)/100).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 export const fmt=(iso:string)=>new Date(iso).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric',timeZone:'UTC'});
-export const waitLabel=(date:string)=>{const difference=new Date(date).getTime()-Date.now();if(difference<=0)return 'Available now';const h=Math.floor(difference/3600000);const m=Math.ceil((difference%3600000)/60000);return (h>0?h+'h ':'')+m+'m remaining'};
+export const waitLabel=(date:string,reference=Date.now())=>{
+ const total=Math.max(0,Math.ceil((new Date(date).getTime()-reference)/1000));
+ if(total===0)return 'Available now';
+ const d=Math.floor(total/86400),h=Math.floor((total%86400)/3600),m=Math.floor((total%3600)/60),s=total%60;
+ const pad=(n:number)=>String(n).padStart(2,'0');
+ return (d?d+'d ':'')+pad(h)+'h '+pad(m)+'m '+pad(s)+'s';
+};
 export const userEmail=(username:string)=>username.trim().toLowerCase()+'@accounts.yrewards.invalid';
 export const youtubeId=(url:string)=>{try{const u=new URL(url);const host=u.hostname.replace(/^www\./,'');if(host==='youtu.be')return /^[\w-]{11}$/.test(u.pathname.slice(1))?u.pathname.slice(1):null;if(host==='youtube.com'||host==='m.youtube.com'){const id=u.pathname.startsWith('/shorts/')?u.pathname.split('/')[2]:u.searchParams.get('v');return id&&/^[\w-]{11}$/.test(id)?id:null;}}catch{/* invalid URL */}return null};
 export type Task={id:string;day_number:number;slot:number;brand_name:string;title:string;youtube_url:string|null;licensed_video_url:string|null;min_watch_seconds:number;reward_cents:number;active:boolean};

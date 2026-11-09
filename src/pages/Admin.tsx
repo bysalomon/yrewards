@@ -1,13 +1,11 @@
 import {useCallback,useEffect,useState,type FormEvent} from 'react';
 import {Link} from 'react-router-dom';
+import {AcademyAdmin} from './AcademyAdmin';
 import {ArrowRight,BadgeCheck,CheckCircle2,ClipboardCopy,FileText,LockKeyhole,Plus,ShieldAlert,ShieldCheck,ThumbsDown,ThumbsUp,Users,Video,Wallet,X} from 'lucide-react';
 import {supabase,money,fmt,describeError,youtubeId,type Task,type Profile,type WalletAccount,type Withdrawal,type Destination,type Identity,type Feedback} from '../lib';
 
 type TaskForm={day_number:number;slot:number;brand_name:string;title:string;youtube_url:string;minimum_minutes:string;reward_usd:string;active:boolean};
-type ClubLesson={id:string;module_title:string;title:string;description:string;youtube_url:string|null;sort_order:number;active:boolean};
-type ClubForm=Omit<ClubLesson,'id'|'youtube_url'>&{id?:string;youtube_url:string};
 const initial:TaskForm={day_number:1,slot:1,brand_name:'',title:'',youtube_url:'',minimum_minutes:'1',reward_usd:'1.00',active:true};
-const initialClub:ClubForm={module_title:'Getting started',title:'',description:'',youtube_url:'',sort_order:1,active:true};
 export function AdminPage(){
  const [allowed,setAllowed]=useState<boolean|null>(null);
  useEffect(()=>{void supabase.auth.mfa.getAuthenticatorAssuranceLevel().then(({data})=>setAllowed(data?.currentLevel==='aal2'))},[]);
@@ -18,8 +16,6 @@ export function AdminPage(){
 }
 function AdminContent(){
  const [tab,setTab]=useState<'tasks'|'club'|'members'|'payments'|'invitations'>('tasks');
- const [clubForm,setClubForm]=useState<ClubForm>(initialClub);
- const [lessons,setLessons]=useState<ClubLesson[]>([]);
  const [form,setForm]=useState<TaskForm>(initial);
  const [tasks,setTasks]=useState<Task[]>([]);const [members,setMembers]=useState<Profile[]>([]);
  const [wallets,setWallets]=useState<(WalletAccount&{user_id:string})[]>([]);
@@ -29,20 +25,19 @@ function AdminContent(){
  const [busy,setBusy]=useState(false);const [error,setError]=useState('');const [message,setMessage]=useState('');
  const [invite,setInvite]=useState('');const [documentUrl,setDocumentUrl]=useState('');
  const load=useCallback(async()=>{
-  const [t,p,w,f,x,d,i,c]=await Promise.all([
+  const [t,p,w,f,x,d,i]=await Promise.all([
    supabase.from('video_tasks').select('*').order('day_number').order('slot'),
    supabase.from('profiles').select('*').order('created_at',{ascending:false}),
    supabase.from('wallet_accounts').select('*'),
    supabase.from('video_feedback').select('*').order('created_at',{ascending:false}).limit(400),
    supabase.from('withdrawals').select('*').order('requested_at',{ascending:false}),
    supabase.from('payout_destinations').select('*'),
-   supabase.from('identity_verifications').select('*').order('created_at',{ascending:false}),
-   supabase.from('club_lessons').select('*').order('module_title').order('sort_order')]);
-  for(const result of [t,p,w,f,x,d,i,c])if(result.error)throw result.error;
+   supabase.from('identity_verifications').select('*').order('created_at',{ascending:false})]);
+  for(const result of [t,p,w,f,x,d,i])if(result.error)throw result.error;
   setTasks((t.data||[]) as Task[]);setMembers((p.data||[]) as Profile[]);
   setWallets((w.data||[]) as (WalletAccount&{user_id:string})[]);
   setReviews((f.data||[]) as Feedback[]);setPayments((x.data||[]) as Withdrawal[]);
-  setDestinations((d.data||[]) as Destination[]);setIdentity((i.data||[]) as Identity[]);setLessons((c.data||[]) as ClubLesson[]);
+  setDestinations((d.data||[]) as Destination[]);setIdentity((i.data||[]) as Identity[]);
  },[]);
  useEffect(()=>{void load().catch(e=>setError(describeError(e)))},[load]);
  const memberName=(id:string)=>members.find(m=>m.id===id)?.full_name||'Unknown member';
@@ -65,19 +60,6 @@ function AdminContent(){
  youtube_url:t.youtube_url||'',
  minimum_minutes:String(t.min_watch_seconds/60),reward_usd:(t.reward_cents/100).toFixed(2),active:t.active});
  window.scrollTo({top:0,behavior:'smooth'})}
- async function saveClub(e:FormEvent){e.preventDefault();setBusy(true);setError('');setMessage('');
-  try{
-   if(clubForm.youtube_url && !youtubeId(clubForm.youtube_url))throw Error('Enter a valid YouTube URL or leave it blank for a text guide.');
-   const payload={module_title:clubForm.module_title.trim(),title:clubForm.title.trim(),description:clubForm.description.trim(),
-    youtube_url:clubForm.youtube_url.trim()||null,sort_order:clubForm.sort_order,active:clubForm.active};
-   const result=clubForm.id?await supabase.from('club_lessons').update(payload).eq('id',clubForm.id):await supabase.from('club_lessons').insert(payload);
-   if(result.error)throw result.error;
-   setMessage('Member Club lesson saved.');setClubForm(initialClub);await load();
-  }catch(e){setError(describeError(e))}finally{setBusy(false)}
- }
- function editClub(lesson:ClubLesson){setClubForm({...lesson,youtube_url:lesson.youtube_url||''});window.scrollTo({top:0,behavior:'smooth'})}
- async function toggleClub(lesson:ClubLesson){setError('');const {error}=await supabase.from('club_lessons').update({active:!lesson.active}).eq('id',lesson.id);
-  if(error)setError(error.message);else await load()}
  async function flipTask(t:Task){setError('');const {error}=await supabase.from('video_tasks').update({active:!t.active}).eq('id',t.id);
  if(error)setError(error.message);else await load()}
  async function issueInvite(){setBusy(true);setError('');setInvite('');try{
@@ -126,18 +108,7 @@ function AdminContent(){
  <div className="catalogue">{tasks.map(t=><div className="catalogueItem" key={t.id}><div><span className="eyebrow">DAY {t.day_number} · VIDEO {t.slot} · {t.brand_name.toUpperCase()}</span>
  <strong>{t.title}</strong><small>{t.min_watch_seconds}s research · {money(t.reward_cents)} · {t.active?'Active':'Hidden'}</small></div>
  <div><button className="smallAction" onClick={()=>edit(t)}>Edit</button><button className="smallAction" onClick={()=>void flipTask(t)}>{t.active?'Disable':'Enable'}</button></div></div>)}</div>}</section></div></>}
- {tab==='club'&&<div className="adminGrid"><section className="panel"><span className="eyebrow">MEMBER CLUB · COURSE EDITOR</span><h2>{clubForm.id?'Edit a lesson':'Publish a video lesson'}</h2><p className="muted">Organise member tutorials into modules. Club lessons never pay rewards.</p>
- <form className="stackedForm" onSubmit={e=>void saveClub(e)}>
-  <label>Module name<input minLength={2} maxLength={80} required value={clubForm.module_title} onChange={e=>setClubForm(f=>({...f,module_title:e.target.value}))} placeholder="Getting started"/></label>
-  <label>Lesson title<input minLength={3} maxLength={140} required value={clubForm.title} onChange={e=>setClubForm(f=>({...f,title:e.target.value}))} placeholder="How to use YVRewards"/></label>
-  <label>YouTube lesson URL (optional for text guides)<input type="url" value={clubForm.youtube_url} onChange={e=>setClubForm(f=>({...f,youtube_url:e.target.value}))} placeholder="https://www.youtube.com/watch?v=..."/></label>
-  <label>Lesson description<textarea rows={4} maxLength={1500} value={clubForm.description} onChange={e=>setClubForm(f=>({...f,description:e.target.value}))} placeholder="Explain what this lesson teaches."/></label>
-  <label>Position in module<input type="number" required min={1} max={200} value={clubForm.sort_order} onChange={e=>setClubForm(f=>({...f,sort_order:Number(e.target.value)}))}/></label>
-  <label className="checkLabel"><input type="checkbox" checked={clubForm.active} onChange={e=>setClubForm(f=>({...f,active:e.target.checked}))}/> Published and visible to members</label>
-  <button className="button btnRed wide" disabled={busy}><Plus size={17}/> {clubForm.id?'Save changes':'Add lesson'}</button>
-  {clubForm.id&&<button className="button btnOutline wide" type="button" onClick={()=>setClubForm(initialClub)}>Cancel editing</button>}
- </form></section>
- <section className="panel"><h2>Published lessons</h2>{!lessons.length?<p className="muted">No Member Club lessons yet. Add your first YouTube lesson on the left.</p>:<div className="catalogue">{lessons.map(l=><div key={l.id} className="catalogueItem"><div><span className="eyebrow">{l.module_title} · LESSON {l.sort_order}</span><strong>{l.title}</strong><small>{l.active?'Published':'Hidden'} · {l.youtube_url?'YouTube video':'Reading guide'}</small></div><div><button className="smallAction" onClick={()=>editClub(l)}>Edit</button><button className="smallAction" onClick={()=>void toggleClub(l)}>{l.active?'Hide':'Publish'}</button></div></div>)}</div>}</section></div>}
+ {tab==='club'&&<AcademyAdmin/>}
  {tab==='members'&&<div className="adminGrid"><section className="panel"><h2>Members</h2><div className="responsiveTable"><table><thead><tr><th>Name</th><th>Username</th><th>Registered</th><th>Wallet</th></tr></thead><tbody>{members.map(m=><tr key={m.id}><td>{m.full_name}</td><td>@{m.username}</td><td>{fmt(m.created_at)}</td>
  <td>{money(wallets.find(w=>w.user_id===m.id)?.available_cents)}</td></tr>)}</tbody></table></div></section>
  <section className="panel"><h2>Recent brand feedback</h2><div className="responsiveTable"><table><thead><tr><th>Member</th><th>Brief</th><th>Rating</th><th>Reward</th></tr></thead>

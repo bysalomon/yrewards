@@ -38,7 +38,7 @@ export function Landing(){
  const [modal,setModal]=useState<string|null>(null);const [menu,setMenu]=useState(false);
  useEffect(()=>{const f=(e:KeyboardEvent)=>{if(e.key==='Escape'){setModal(null);setMenu(false)}};window.addEventListener('keydown',f);return()=>window.removeEventListener('keydown',f)},[]);
  return <div className="landing">
-  <video className="heroVideo" autoPlay muted loop playsInline preload="metadata" aria-hidden="true"><source type="video/mp4" src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260808_112712_da9d53df-6d27-4b12-bdf6-aa9dc2622bdf.mp4"/></video>
+  <video className="heroVideo" autoPlay muted loop playsInline preload="metadata" aria-hidden="true"><source type="video/mp4" src="https://videos.pexels.com/video-files/36592847/15514671_1920_1080_30fps.mp4"/></video>
   <div className="heroOverlay"/><div className="landingWrap">
    <header className="landingHeader"><Link to="/"><Brand/></Link><nav className={menu?'navLinks open':'navLinks'}>
     {Object.entries(content).map(([key,title])=><button key={key} onClick={()=>{setModal(key);setMenu(false)}}>{title}</button>)}
