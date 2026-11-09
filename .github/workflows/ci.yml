@@ -46,5 +46,12 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -f tests/sql/bootstrap.sql
       - name: Apply YRewards migration to disposable PostgreSQL
         run: psql -v ON_ERROR_STOP=1 -f supabase/migrations/202611080001_initial.sql
+      - name: Apply YRewards security, account and research migrations
+        run: |
+          psql -v ON_ERROR_STOP=1 -f supabase/migrations/202611080002_security_hardening.sql
+          psql -v ON_ERROR_STOP=1 -f supabase/migrations/202611080003_admin_bootstrap.sql
+          psql -v ON_ERROR_STOP=1 -f supabase/migrations/202611090001_research_club_experience.sql
       - name: Verify schedule, one-time credit and 24-hour unlock
         run: psql -v ON_ERROR_STOP=1 -f tests/sql/assertions.sql
+      - name: Verify five-video research, sequence, ledger and club
+        run: psql -v ON_ERROR_STOP=1 -f tests/sql/experience_assertions.sql
