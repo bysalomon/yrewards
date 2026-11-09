@@ -32,8 +32,22 @@ export function useMemberData(){
  return {data,loading,error,refresh};
 }
 export function MemberLayout({adminArea=false}:{adminArea?:boolean}){
- const {profile,admin,signOut}=useAuth();const [open,setOpen]=useState(false);
+ const {user,profile,admin,signOut}=useAuth();const [open,setOpen]=useState(false);
  const loc=useLocation();const navigate=useNavigate();
+ useEffect(()=>{
+  if(!user)return;
+  let active=true;
+  async function applyPreferences(){
+   const {data}=await supabase.from('member_preferences').select('reduced_motion,compact_cards').eq('user_id',user?.id).maybeSingle();
+   if(!active)return;
+   document.body.classList.toggle('prefReducedMotion',Boolean(data?.reduced_motion));
+   document.body.classList.toggle('prefCompact',Boolean(data?.compact_cards));
+  }
+  void applyPreferences();
+  window.addEventListener('yrewards:preferences-updated',applyPreferences);
+  return()=>{active=false;window.removeEventListener('yrewards:preferences-updated',applyPreferences);
+   document.body.classList.remove('prefReducedMotion','prefCompact')};
+ },[user]);
  const nav=adminArea?[{path:'/admin',label:'Administration',icon:ShieldCheck},{path:'/app',label:'Member workspace',icon:LayoutDashboard}]:
  [{path:'/app',label:'Dashboard',icon:LayoutDashboard},{path:'/app/club',label:'Member Club',icon:BookOpen},{path:'/app/profile',label:'My Profile',icon:UserRound},{path:'/app/settings',label:'Settings',icon:Settings2},{path:'/app/wallet',label:'Wallet & payments',icon:WalletIcon}];
  const leave=async()=>{await signOut();navigate('/')};

@@ -38,11 +38,10 @@ export function MemberSettings(){
   if(!active)return;
   if(error)setError(error.message);else if(data)setPrefs({reduced_motion:Boolean((data as Preferences).reduced_motion),compact_cards:Boolean((data as Preferences).compact_cards),show_tips:Boolean((data as Preferences).show_tips)});
  });return()=>{active=false}},[user]);
- useEffect(()=>{document.body.classList.toggle('prefReducedMotion',prefs.reduced_motion);document.body.classList.toggle('prefCompact',prefs.compact_cards);
-  return()=>{document.body.classList.remove('prefReducedMotion','prefCompact')}},[prefs]);
+
  async function savePrefs(){if(!user)return;setSaving(true);setError('');setMessage('');
   const {error}=await supabase.from('member_preferences').upsert({user_id:user.id,...prefs,updated_at:new Date().toISOString()},{onConflict:'user_id'});
-  if(error)setError(error.message);else setMessage('Your preferences have been saved.');setSaving(false);
+  if(error)setError(error.message);else{setMessage('Your preferences have been saved.');window.dispatchEvent(new Event('yrewards:preferences-updated'))}setSaving(false);
  }
  async function savePassword(e:FormEvent){e.preventDefault();setError('');setMessage('');
   if(password.length<12){setError('Use a password with at least 12 characters.');return}
