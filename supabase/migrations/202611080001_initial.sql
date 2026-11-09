@@ -293,7 +293,7 @@ declare v_user uuid:=auth.uid();v_schedule jsonb;v_account public.wallet_account
  v_id uuid;v_previous int;
 begin
  if v_user is null then raise exception 'Sign in required';end if;
- if p_cents<100 then raise exception 'Minimum withdrawal is $1.00';end if;
+ if p_cents<25000 then raise exception 'Minimum withdrawal is $250.00';end if;
  if not exists(select 1 from public.payout_destinations where id=p_destination
  and user_id=v_user and verified) then raise exception 'Payment destination requires staff approval';end if;
  select count(*) into v_previous from public.withdrawals where user_id=v_user;
