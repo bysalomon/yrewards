@@ -9,7 +9,8 @@ Independent, invitation-only brand-video research platform using React 19, TypeS
 - Website: https://yrewards.vercel.app
 - Member dashboard: https://yrewards.vercel.app/app
 - Daily video research: `/app/tasks/:day`
-- Member Club: https://yrewards.vercel.app/app/club
+- Member Club course catalogue: https://yrewards.vercel.app/app/club
+- Member Club course detail: `/app/club/:courseId`
 - My Profile: https://yrewards.vercel.app/app/profile
 - Settings: https://yrewards.vercel.app/app/settings
 - Administration (MFA required): https://yrewards.vercel.app/admin
@@ -23,7 +24,7 @@ Independent, invitation-only brand-video research platform using React 19, TypeS
 - **Daily research:** up to **five videos per day**, ordered by slot. One main video and a lateral sequential playlist, adapted from the Member Club visual reference. First unreviewed task is selected; on submitting one positive/negative evaluation the next research brief becomes available. Next day opens **24 hours after the final active review**; the cycle repeats after Day 30.
 - **YouTube-only admin inputs:** publish a task with only a valid YouTube URL, title, brand, day, order, independent preparation time and USD evaluation reward. No external MP4 file is required. Existing credits and wallet ledger are preserved by migration.
 - **YouTube playback rules:** YouTube embeds are optional references, not paid views. The server-side minimum time for YouTube-only tasks is an **independent research-preparation period** starting when the task is opened. The code never relies on YouTube player watch time to release a payment. Brand feedback is one reward per task and cycle. See compliance note below.
-- **Member Club:** dedicated course/lesson area, central 16:9 content viewer, modules and lesson playlist at the side, per-member completion markers, and three built-in non-video onboarding guides. Administrators can create, edit, hide and reorder **YouTube tutorials** or text reading guides. Club lessons are not remunerated.
+- **Member Club:** course catalogue with a dark-red hero and horizontal gallery of vertical 9:16 course covers; clicking a course opens its own 16:9 player and module/lesson playlist. Unlimited modules per course and YouTube videos per module (no 200-slot legacy limit), with per-member lesson completion. Three original reading guides remain in the migrated **YVRewards Essentials** course. Administrators manage everything in three steps (course with cover upload/crop → modules → YouTube lessons) without editing SQL. Member Club lessons are not remunerated.
 - **My Profile:** account summary, editable full name, permanent username, member since, research stats and wallet summary.
 - **Settings:** password changes and account-level persisted preferences for motion, compact cards and research tips. Admin MFA remains mandatory for privileged work.
 - **Wallet:** USD, scheduled withdrawal request days anchored to signup date, maximum four per calendar month, minimum $250, manual KYC for first withdrawal, staff-approved destination and staff-controlled payment review with actual transaction reference.
@@ -45,6 +46,8 @@ Therefore YVRewards pays for independent research feedback **not YouTube playbac
   - `202611080003_admin_bootstrap.sql`
   - `202611090001_research_club_experience.sql`
   - `202611090002_member_club_onboarding.sql`
+  - `202611090003_academy_courses.sql`
+  - `202611090004_module_title_width.sql`
 - Edge Functions active: `accept-invite` and `create-invite`. The service-role key must stay on the Supabase server, **never** in a Vite, GitHub or Vercel public environment variable.
 - Vercel variables: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` point only to YVRewards Supabase.
 
@@ -57,7 +60,7 @@ npm run build
 npm test
 ```
 
-GitHub Actions builds TypeScript/Vite, runs the unit tests and applies **all five migrations** to an isolated PostgreSQL 17 instance before running SQL tests. Checks cover the payout calendar, day unlocking, single wallet credit, five-slot validation, sequential reviews, independent preparation timer, Member Club progress, password-independent profile changes and persisted preferences.
+GitHub Actions builds TypeScript/Vite, runs the unit tests and applies **all five migrations** to an isolated PostgreSQL 17 instance before running SQL tests. Checks cover the payout calendar, day unlocking, single wallet credit, five-slot validation, sequential reviews, independent preparation timer, Member Club progress, nested course/module architecture with legacy progress preservation, 200+ video ordering, extended module names, profile changes and saved preferences.
 
 The repository does not yet include a reproducible `package-lock.json` or real browser E2E automation. Before a broad launch, add these and exercise invitation, user registration, task research, club progress, KYC and actual staff payout in the hosted environment.
 
@@ -68,3 +71,14 @@ An administrator account with verified TOTP and one real invited member were pre
 Before scaling to real payouts: verify public signup stays disabled, enable leaked-password protection in Supabase Auth, review database security advisor warnings for intentionally exposed authenticated `SECURITY DEFINER` RPCs, publish country-appropriate terms and privacy policies, verify actual media rights, define fraud controls, ID retention, account recovery and support procedures, and test the manual payout workflow with an actual approved transaction.
 
 **VoiceTask remains entirely unchanged by these tasks.**
+
+## November 9, 2026 academy refresh
+
+- Landing hero background changed to the user-supplied Pexels MP4, retaining dark fade/overlay.
+- Fixed invisible pagination controls with explicit dark/red styles and page-number buttons.
+- 24-hour unlock countdown refreshes each second, with distinct red pulse animation.
+- Mobile member topbar displays only the official YVRewards logo next to the menu.
+- Member Club course editor automatically crops uploaded JPEG/PNG/WebP cover artwork to 720×1280 portrait, stores the public image in a separate **club-covers** bucket, and keeps identity-document storage private and unrelated.
+- Access rules: only MFA-verified administrators can create/edit courses, modules, lessons and upload covers; members can view published material and mark their own lesson progress.
+- Existing course has **no portrait image yet** because it was migrated from text guides. Add one in **Admin → Member Club → Edit course**. No fictional cover art or fake courses were inserted.
+- Post-change verification: SQL migration applied to YRewards-only Supabase, PostgreSQL CI passed, Vercel production deployment READY. A browser-based test while logged in as the administrator or a member remains a recommended final acceptance check.
