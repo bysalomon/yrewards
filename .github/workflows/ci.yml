@@ -52,7 +52,10 @@ jobs:
           psql -v ON_ERROR_STOP=1 -f supabase/migrations/202611080003_admin_bootstrap.sql
           psql -v ON_ERROR_STOP=1 -f supabase/migrations/202611090001_research_club_experience.sql
           psql -v ON_ERROR_STOP=1 -f supabase/migrations/202611090002_member_club_onboarding.sql
+          psql -v ON_ERROR_STOP=1 -f supabase/migrations/202611090003_academy_courses.sql
       - name: Verify schedule, one-time credit and 24-hour unlock
         run: psql -v ON_ERROR_STOP=1 -f tests/sql/assertions.sql
       - name: Verify five-video research, sequence, ledger and club
         run: psql -v ON_ERROR_STOP=1 -f tests/sql/experience_assertions.sql
+      - name: Verify course hierarchy, unlimited ordering and retained progress
+        run: psql -v ON_ERROR_STOP=1 -f tests/sql/academy_assertions.sql

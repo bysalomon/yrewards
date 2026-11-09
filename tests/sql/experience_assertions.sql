@@ -3,7 +3,7 @@ do $test$
 declare
  u uuid:='22222222-2222-4222-8222-222222222222';
  v4 uuid;v5 uuid;v_balance bigint;v_day record;
- refused boolean;v_lesson uuid;v_time timestamptz;
+ refused boolean;v_lesson uuid;v_module uuid;v_time timestamptz;
 begin
  update public.video_tasks set active=false where day_number=1;
  insert into public.video_tasks(day_number,slot,brand_name,title,youtube_url,licensed_video_url,min_watch_seconds,reward_cents)
@@ -53,8 +53,10 @@ begin
  if v_day.day_number<>2 or v_day.unlocks_at<=now() then
   raise exception 'Second research day must lock for 24 hours';end if;
 
- insert into public.club_lessons(module_title,title,description,youtube_url,sort_order)
- values('CI testing module','An introductory lesson','YVRewards training','https://www.youtube.com/watch?v=abcdefghijk',1)
+ select id into v_module from public.club_modules where title='Getting started' limit 1;
+ if v_module is null then raise exception 'Seed module not found';end if;
+ insert into public.club_lessons(module_id,module_title,title,description,youtube_url,sort_order)
+ values(v_module,'Getting started','An introductory lesson','YVRewards training','https://www.youtube.com/watch?v=abcdefghijk',100)
  returning id into v_lesson;
  insert into public.club_progress(user_id,lesson_id) values(u,v_lesson);
  if not exists(select 1 from public.club_progress where user_id=u and lesson_id=v_lesson)
