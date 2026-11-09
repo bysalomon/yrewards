@@ -199,3 +199,9 @@ th{color:#a89da0}
 .adminVerified,.success,.voted{background:#2a2022;color:#ff888b;border-color:#73383e}
 .reviewRecorded{background:#342629;border-color:#774044;color:#fff}
 @media(max-width:520px){.adminVideoPreview img{width:90px}.adminVideoPreview{gap:9px}.researchLayout{gap:13px}.playlistThumb{width:78px}}
+
+.clubReadingLesson{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:32px 38px;width:100%;height:100%;background:radial-gradient(ellipse at 45% 7%,#4c272b,#201b1d 45%,#100e0f 88%);overflow-y:auto}
+.clubReadingLesson>svg{color:#fd2f33}
+.clubReadingLesson h3{font-family:'Manrope',sans-serif;font-size:clamp(22px,2.5vw,34px);margin:0;color:#fff}
+.clubReadingLesson p{font-size:clamp(12px,1vw,14px);line-height:1.75;color:#e5dada;max-width:680px;margin:0}
+@media(max-width:740px){.clubReadingLesson{padding:19px 18px;gap:8px}.clubReadingLesson h3{font-size:19px}.clubReadingLesson p{font-size:11px;line-height:1.45}.clubReadingLesson>svg{width:25px;height:25px}}
