@@ -64,7 +64,7 @@ export function MemberLayout({adminArea=false}:{adminArea?:boolean}){
    <button className="logout" onClick={()=>void leave()}><LogOut size={16}/> Sign out</button></div>
   </aside>
   <div className="workBody"><header className="topbar"><button className="hamburger" aria-label="Open menu" onClick={()=>setOpen(true)}><Menu/></button>
-   <span className="breadcrumb">YRewards <span>/</span> {adminArea?'Administration':'My workspace'}</span>
+   <span className="breadcrumb">YVRewards <span>/</span> {adminArea?'Administration':'My workspace'}</span>
    <div className="topRight"><span className="onlineDot"/> <span className="topPresence">Research member</span><div className="avatar small">{profile?.username?.[0]?.toUpperCase()||'Y'}</div></div>
   </header><main className="page"><Outlet/></main></div>
  </div>
@@ -73,7 +73,7 @@ export function Dashboard(){
  const {data,loading,error,refresh}=useMemberData();const [page,setPage]=useState(1);
  const [now,setNow]=useState(Date.now());
  useEffect(()=>{const timer=window.setInterval(()=>setNow(Date.now()),10000);return()=>clearInterval(timer)},[]);
- if(loading)return <div className="loading">Loading your YRewards workspace…</div>;
+ if(loading)return <div className="loading">Loading your YVRewards workspace…</div>;
  if(error||!data)return <div className="error">Could not load your workspace. {error}<button onClick={()=>void refresh()}>Try again</button></div>;
  const {day,wallet,feedback,tasks,completions,profile,watches}=data;
  const allWatched=watches.reduce((a,w)=>a+Number(w.played_seconds),0);

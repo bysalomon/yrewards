@@ -18,7 +18,7 @@ function Protected({adminOnly=false,children}:{adminOnly?:boolean;children:React
  return <>{children}</>;
 }
 export function App(){return <>
- {!configured&&<div className="setupBanner">YRewards is awaiting its own Supabase environment. <Link to="/setup">Setup instructions</Link></div>}
+ {!configured&&<div className="setupBanner">YVRewards is awaiting its own Supabase environment. <Link to="/setup">Setup instructions</Link></div>}
  <Routes>
   <Route path="/" element={<Landing/>}/>
   <Route path="/login" element={<Login/>}/>

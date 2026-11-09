@@ -3,7 +3,7 @@ import {Link,useParams} from 'react-router-dom';
 import {ArrowRight,ArrowUpRight,BadgeCheck,CheckCircle2,ChevronRight,CircleDollarSign,Menu,ShieldCheck,Star,Wallet,X} from 'lucide-react';
 const about:Record<string,[string,string[]]>={
  how:['How it works',[
-  'YRewards is an independent, invitation-only market-research community. Participating brands commission feedback on authorised promotional video material.',
+  'YVRewards is an independent, invitation-only market-research community. Participating brands commission feedback on authorised promotional video material.',
   'Invited members examine brand creative and submit an independent positive or negative evaluation. Our research helps partners understand what works, refine their communication and improve future advertising experiences.',
   'Rewards are linked to completed, eligible independent research feedback. The programme is not affiliated with, endorsed by or operated by YouTube. Embedded YouTube videos are optional, unpaid references; rewards are not based on their views or player engagement.'
  ]],
@@ -17,7 +17,7 @@ const about:Record<string,[string,string[]]>={
   'The minimum withdrawal is $250. Payments are processed manually by our team; a request is not a transfer confirmation.'
  ]],
  terms:['Terms of participation',[
-  'YRewards is an independent market-research service for invited participants aged 18 or older. Members must provide genuine feedback on assigned creative assets.',
+  'YVRewards is an independent market-research service for invited participants aged 18 or older. Members must provide genuine feedback on assigned creative assets.',
   'Each task shows its reward and independent research preparation time in advance. Credits are subject to platform eligibility and fraud-prevention checks. One account per person; do not share invitations or automate activity.',
   'Production launch requires published country-specific programme terms and payment eligibility rules.'
  ]],
@@ -27,7 +27,7 @@ const about:Record<string,[string,string[]]>={
   'Production launch requires a final privacy notice explaining retention periods, legal bases, recipients, data rights and contact details.'
  ]],
  setup:['Deployment setup',[
-  'Connect YRewards to a separate Supabase project; do not reuse VoiceTask project credentials. Apply the migration in supabase/migrations, deploy accept-invite and create-invite, then configure the VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY environment variables.',
+  'Connect YVRewards to a separate Supabase project; do not reuse VoiceTask project credentials. Apply the migration in supabase/migrations, deploy accept-invite and create-invite, then configure the VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY environment variables.',
   'Disable public signups in Supabase Auth. Create an admin user and assign its UUID in public.admin_roles. Enrol and verify TOTP MFA before accessing administrator actions.',
   'Link the yrewards GitHub repository to a separate Vercel project. Before going live, test invited registration, research sessions, KYC, wallet ledger and manual payouts.'
  ]]
@@ -59,5 +59,5 @@ export function Landing(){
 export function InfoPage(){
  const {topic='terms'}=useParams();const entry=about[topic]||about.terms;
  return <div className="infoPage"><div className="infoNav"><Link to="/"><Brand/></Link><Link to="/login">Sign in <ArrowRight size={14}/></Link></div>
- <article className="infoContent"><span className="eyebrow"><Star size={15}/> YREWARDS / INFORMATION</span><h1>{entry[0]}</h1>{entry[1].map(s=><p key={s}>{s}</p>)}<p className="muted"><CircleDollarSign size={15} style={{verticalAlign:'middle'}}/> YRewards is a private brand-feedback service, not a YouTube partner.</p><Link to="/" className="button btnRed">Back to home <ArrowRight size={16}/></Link></article></div>
+ <article className="infoContent"><span className="eyebrow"><Star size={15}/> YREWARDS / INFORMATION</span><h1>{entry[0]}</h1>{entry[1].map(s=><p key={s}>{s}</p>)}<p className="muted"><CircleDollarSign size={15} style={{verticalAlign:'middle'}}/> YVRewards is a private brand-feedback service, not a YouTube partner.</p><Link to="/" className="button btnRed">Back to home <ArrowRight size={16}/></Link></article></div>
 }

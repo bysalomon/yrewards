@@ -105,7 +105,7 @@ function AdminContent(){
   {label:'Video briefs',value:String(tasks.filter(t=>t.active).length),icon:Video},
   {label:'Research feedback',value:String(reviews.length),icon:ThumbsUp},
   {label:'Unpaid requests',value:String(payments.filter(p=>!['paid','declined'].includes(p.status)).length),icon:Wallet}];
- return <><div className="pageHead"><div><span className="eyebrow">SECURE ADMINISTRATION · MFA PROTECTED</span><h1>YRewards Control Centre <span className="redAccent">.</span></h1><p>Manage video research, members, invitations and manual payment approvals.</p></div><span className="adminVerified"><ShieldCheck size={17}/> MFA verified</span></div>
+ return <><div className="pageHead"><div><span className="eyebrow">SECURE ADMINISTRATION · MFA PROTECTED</span><h1>YVRewards Control Centre <span className="redAccent">.</span></h1><p>Manage video research, members, invitations and manual payment approvals.</p></div><span className="adminVerified"><ShieldCheck size={17}/> MFA verified</span></div>
  <div className="adminMetrics">{metrics.map(({label,value,icon:Icon})=><div className="statCard" key={label}><div className="statTop"><span>{label}</span><Icon size={18}/></div><strong>{value}</strong></div>)}</div>
  <div className="tabs">{([['tasks','Video tasks'],['club','Member Club'],['members','Members & feedback'],['payments','KYC & payouts'],['invitations','Invitations']] as const).map(([value,label])=><button className={tab===value?'active':''} key={value} onClick={()=>{setTab(value);setError('');setMessage('')}}>{label}</button>)}</div>
  {tab==='tasks'&&<><div className="adminGrid"><section className="panel"><span className="eyebrow"><Plus size={15}/> TASK EDITOR</span><h2>Publish a research video</h2>
@@ -116,6 +116,7 @@ function AdminContent(){
  <label>Brand name<input required maxLength={90} value={form.brand_name} onChange={e=>field('brand_name',e.target.value)} placeholder="Brand or campaign"/></label>
  <label>Task title<input required maxLength={160} value={form.title} onChange={e=>field('title',e.target.value)} placeholder="What should reviewers evaluate?"/></label>
  <label>YouTube video URL<input type="url" required value={form.youtube_url} onChange={e=>field('youtube_url',e.target.value)} placeholder="https://www.youtube.com/watch?v=..."/></label>
+ {youtubeId(form.youtube_url)&&<div className="adminVideoPreview"><img src={'https://i.ytimg.com/vi/'+youtubeId(form.youtube_url)+'/hqdefault.jpg'} alt="YouTube video thumbnail preview"/><div><strong>YouTube video detected</strong><small>Embed preview will be shown in the member's task. No separate MP4 link is needed.</small></div></div>}
  <div className="fieldGrid"><label>Minimum independent research time (minutes)<input required type="number" min="0.1667" max="60" step="0.01667" value={form.minimum_minutes} onChange={e=>field('minimum_minutes',e.target.value)}/></label>
  <label>Reward for this evaluation (USD)<input required type="number" min="0.01" max="1000" step="0.01" value={form.reward_usd} onChange={e=>field('reward_usd',e.target.value)}/></label></div>
  <label className="checkLabel"><input type="checkbox" checked={form.active} onChange={e=>field('active',e.target.checked)}/> Publish task for invited members</label>
