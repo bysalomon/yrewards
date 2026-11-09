@@ -1,45 +1,70 @@
-# YRewards
+# YVRewards
 
-Independent, invitation-only video research and feedback platform built with React 19, Vite, TypeScript and Supabase.
+Independent, invitation-only brand-video research platform using React 19, TypeScript, Vite, Supabase and Vercel.
 
-**Safety boundary:** VoiceTask was inspected only as a structural reference. YRewards has its own source, database migration, Edge Functions, design system and intended Vercel deployment. Never reuse the VoiceTask Supabase project, domain, secrets, storage, wallet or configuration.
+**Source and infrastructure isolation:** Work only in `bysalomon/yrewards`, Supabase project `zbchamxgnddeiktdxljo`, and the Vercel project `yrewards`. Do **not** modify `bysalomon/voicetask` or `voicetask-staging`.
 
-## Features
+## Production URL and routes
 
-- Landing: “Get paid to watch and review videos.” YRewards/YVRewards brand, user-provided logo and CloudFront hero video, charcoal/black/red palette.
-- Invitation-only registration: personal one-use link, username, first name, surname, password (minimum 12 characters); **no email verification**. Sign in with username and password. Account recovery requires manual support because no verified email is collected.
-- Member dashboard: USD wallet, completed feedback, research hours watched and account level. No ranking for users or staff.
-- Thirty daily cards in four pages (8, 8, 8, 6). Day 1 starts unlocked. Completing all active videos on a day unlocks the next day after 24 hours. Completing Day 30 resets the cycle after a further 24 hours.
-- Each day has up to 3 brand-authorised videos. Every video has a measured minimum playback time, positive/negative feedback and its own USD reward. Successful feedback creates one wallet ledger entry and credits the wallet directly.
-- Withdrawals (minimum $250) are limited to four registration-anchored UTC dates per month, one request per date. Members registered on day 1 see days 8/15/22/29. End-of-month dates wrap within shorter months; first-month eligibility requires seven calendar days. Button disabled outside eligibility dates; first-withdrawal ID verification shown only when eligible.
-- Staff manually review identity documentation and payment destinations, approve withdrawal requests, mark processing, and mark as paid **only after a real external payment**, recording reference and proof note.
-- Admin dashboard (TOTP MFA required): add/edit/disable video tasks, list member activity, review feedback, issue one-use invitations, process identity verification and payouts.
+- Website: https://yrewards.vercel.app
+- Member dashboard: https://yrewards.vercel.app/app
+- Daily video research: `/app/tasks/:day`
+- Member Club: https://yrewards.vercel.app/app/club
+- My Profile: https://yrewards.vercel.app/app/profile
+- Settings: https://yrewards.vercel.app/app/settings
+- Administration (MFA required): https://yrewards.vercel.app/admin
+- Administrator authenticator: https://yrewards.vercel.app/admin/mfa
 
-## YouTube restrictions and video-source choice
+## Product features
 
-**YouTube's developer policies prohibit paying for video views made using the YouTube embed API, directly or indirectly.** Thus the rewarded playback path uses a **brand-supplied/authorised HTTPS video asset** (e.g. a licensed CDN-hosted MP4). Admins can also enter a YouTube link for an explicitly optional, *untracked and unrewarded* reference preview. YouTube playback never advances the reward counter. The application is independent and has no affiliation with YouTube.
+- **Branding:** use only the supplied logo image `https://i.imgur.com/Sf3e6O7.png` — no added wordmark. Premium italic red-gradient headline and backgrounds in `#000000`, `#262324` and `#FD2F33`. White is used primarily for typography. Landing hero retains the supplied CloudFront motion video.
+- **Invitation-only accounts:** admin creates one-use, 7-day tokens. Invited people select username, first name, surname and password; signup does not require confirmation email. Public signup must stay disabled. Login is by username or administrator email; lost-password recovery for username-only accounts needs manual handling.
+- **Member dashboard:** wallet balance, review count, research status, authorised-video hours and member level, plus 30 days of research cards in 8/8/8/6 pagination. No public or admin ranking.
+- **Daily research:** up to **five videos per day**, ordered by slot. One main video and a lateral sequential playlist, adapted from the Member Club visual reference. First unreviewed task is selected; on submitting one positive/negative evaluation the next research brief becomes available. Next day opens **24 hours after the final active review**; the cycle repeats after Day 30.
+- **YouTube-only admin inputs:** publish a task with only a valid YouTube URL, title, brand, day, order, independent preparation time and USD evaluation reward. No external MP4 file is required. Existing credits and wallet ledger are preserved by migration.
+- **YouTube playback rules:** YouTube embeds are optional references, not paid views. The server-side minimum time for YouTube-only tasks is an **independent research-preparation period** starting when the task is opened. The code never relies on YouTube player watch time to release a payment. Brand feedback is one reward per task and cycle. See compliance note below.
+- **Member Club:** dedicated course/lesson area, central 16:9 content viewer, modules and lesson playlist at the side, per-member completion markers, and three built-in non-video onboarding guides. Administrators can create, edit, hide and reorder **YouTube tutorials** or text reading guides. Club lessons are not remunerated.
+- **My Profile:** account summary, editable full name, permanent username, member since, research stats and wallet summary.
+- **Settings:** password changes and account-level persisted preferences for motion, compact cards and research tips. Admin MFA remains mandatory for privileged work.
+- **Wallet:** USD, scheduled withdrawal request days anchored to signup date, maximum four per calendar month, minimum $250, manual KYC for first withdrawal, staff-approved destination and staff-controlled payment review with actual transaction reference.
 
-Client-side video events can be forged. The PostgreSQL RPC enforces rate-limited play progress, a minimum wall-clock duration, locked days, one review per video per cycle and an atomic wallet ledger. These safeguards **do not independently prove human attention**. Before issuing significant rewards, implement fraud detection and stronger server-verifiable playback evidence.
+## YouTube compliance constraint
 
-## Activation: do not connect to VoiceTask
+YouTube API Services developer policies prohibit compensating users for directly or indirectly watching embedded YouTube videos. Documentation: https://developers.google.com/youtube/terms/developer-policies/
 
-1. **Completed:** YRewards has its own Supabase project (`zbchamxgnddeiktdxljo`) in `us-east-1`. The initial schema and hardening migrations were applied there. Never run migrations on `voicetask-staging`.
-2. **Completed:** Supabase Edge Functions `accept-invite` (one-use token required) and `create-invite` (admin with MFA required) were deployed to the YRewards project. The privileged service key stays server-side; **never expose service-role keys** to Vite, GitHub or Vercel.
-3. **Action still required:** In [YRewards Authentication Providers](https://supabase.com/dashboard/project/zbchamxgnddeiktdxljo/auth/providers), disable public signup and allow password-based sign-in. Invited registration calls the admin API with `email_confirm: true`, using a reserved synthetic login alias, so no confirmation email is sent. Make sure your Supabase Auth validation accepts the synthetic alias domain before launch. Password recovery is a manual-only process until a verified recovery channel exists.
-4. **Administrator setup (manual credential entry required):** Visit [YRewards Authentication → Users](https://supabase.com/dashboard/project/zbchamxgnddeiktdxljo/auth/users) → **Add user** → **Create new user**. Enter a real admin email and strong unique password you choose yourself, with **Auto confirm user** enabled if shown. Do not send the password in chat. The database automatically generates a valid username from any normal email prefix (including dots or hyphens). Then attach its UUID to `public.admin_roles` in this **YRewards database only**. Log in using your real admin email at `/login`, navigate to `/admin/mfa`, enrol/verify TOTP, and enter `/admin`. Public signup remains disabled.
-5. **Completed:** A separate Vercel project `yrewards` is linked to GitHub and supplied with `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` from the **YRewards Supabase**. A production-branch build is available on a Vercel URL without a custom domain; keep it prelaunch until remaining checks pass.
-6. Use `/admin` to issue invitation links, register a test member, and add at least one Day 1 video. Paid videos require an independently playable brand-authorised HTTPS URL (not a YouTube URL). Test actual video duration and playback on mobile.
-7. Before handling real payments, publish final policies for each target jurisdiction, configure legitimate funding, supported payout destinations, identity-document retention, support contacts, fraud controls, account recovery and staff payment operations.
+Therefore YVRewards pays for independent research feedback **not YouTube playback**, uses a separate research-preparation timer that does not inspect the iframe, and does not require viewers to play or engage with the embedded YouTube video to earn an evaluation reward. The main YouTube player is an optional creative reference. The application is independent of YouTube; avoid claiming a partnership or buying view engagement. Verify copyright, YouTube terms, advertising and local research-law requirements before public rollout.
 
-## Local commands
+## Infrastructure
 
-    npm install
-    npm run dev
-    npm run build
-    npm test
+- GitHub: `bysalomon/yrewards` (main)
+- Supabase: `zbchamxgnddeiktdxljo` (isolated from VoiceTask)
+- Vercel: `yrewards` (linked to GitHub, deployed from main)
+- Supabase migrations applied:
+  - `202611080001_initial.sql`
+  - `202611080002_security_hardening.sql`
+  - `202611080003_admin_bootstrap.sql`
+  - `202611090001_research_club_experience.sql`
+  - `202611090002_member_club_onboarding.sql`
+- Edge Functions active: `accept-invite` and `create-invite`. The service-role key must stay on the Supabase server, **never** in a Vite, GitHub or Vercel public environment variable.
+- Vercel variables: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` point only to YVRewards Supabase.
 
-GitHub Actions runs build and unit tests after each push. A lockfile should be generated with npm, reviewed and committed once the first install resolves.
+## Local development and automated tests
 
-## Operational status
+```sh
+npm install
+npm run dev
+npm run build
+npm test
+```
 
-Frontend, both database migrations, active Edge Functions, Vercel environment and deployment are configured for the **independent YRewards project**. CI build, unit tests and disposable PostgreSQL business-rule checks passed. **Remaining before real users:** confirm Auth public signup disabled, bootstrap MFA admin, provide genuine licensed video briefs, publish final legal notices, and test invitation-to-withdrawal end to end. No VoiceTask state was changed.
+GitHub Actions builds TypeScript/Vite, runs the unit tests and applies **all five migrations** to an isolated PostgreSQL 17 instance before running SQL tests. Checks cover the payout calendar, day unlocking, single wallet credit, five-slot validation, sequential reviews, independent preparation timer, Member Club progress, password-independent profile changes and persisted preferences.
+
+The repository does not yet include a reproducible `package-lock.json` or real browser E2E automation. Before a broad launch, add these and exercise invitation, user registration, task research, club progress, KYC and actual staff payout in the hosted environment.
+
+## Operational cautions
+
+An administrator account with verified TOTP and one real invited member were previously created. They remain intact. Existing US$25 reward transactions are preserved. New YouTube-only research flows are schema-tested on PostgreSQL but **have not been verified by a complete hosted-user browser checkout**; do not conflate build success with E2E certification.
+
+Before scaling to real payouts: verify public signup stays disabled, enable leaked-password protection in Supabase Auth, review database security advisor warnings for intentionally exposed authenticated `SECURITY DEFINER` RPCs, publish country-appropriate terms and privacy policies, verify actual media rights, define fraud controls, ID retention, account recovery and support procedures, and test the manual payout workflow with an actual approved transaction.
+
+**VoiceTask remains entirely unchanged by these tasks.**
