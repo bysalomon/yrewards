@@ -14,7 +14,7 @@ const about:Record<string,[string,string[]]>={
  payments:['Payment methods',[
   'Approved research rewards are credited to your USD wallet. Eligible members can request withdrawals to a staff-approved PayPal or bank destination.',
   'There are up to four scheduled withdrawal dates per calendar month, calculated from your registration date. The request button is available only on those dates. The first withdrawal requires identity verification when the date arrives.',
-  'All payments are processed manually by our team; a request is not a transfer confirmation.'
+  'The minimum withdrawal is $250. Payments are processed manually by our team; a request is not a transfer confirmation.'
  ]],
  terms:['Terms of participation',[
   'YRewards is an independent market-research service for invited participants aged 18 or older. Members must provide genuine feedback on assigned creative assets.',
