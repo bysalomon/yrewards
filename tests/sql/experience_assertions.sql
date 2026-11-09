@@ -54,7 +54,7 @@ begin
   raise exception 'Second research day must lock for 24 hours';end if;
 
  insert into public.club_lessons(module_title,title,description,youtube_url,sort_order)
- values('Getting started','An introductory lesson','YVRewards training','https://www.youtube.com/watch?v=abcdefghijk',1)
+ values('CI testing module','An introductory lesson','YVRewards training','https://www.youtube.com/watch?v=abcdefghijk',1)
  returning id into v_lesson;
  insert into public.club_progress(user_id,lesson_id) values(u,v_lesson);
  if not exists(select 1 from public.club_progress where user_id=u and lesson_id=v_lesson)
