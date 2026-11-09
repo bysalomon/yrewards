@@ -2,7 +2,7 @@ import {useEffect,useState,type FormEvent} from 'react';
 import {Link} from 'react-router-dom';
 import {CalendarDays,CheckCircle2,Clock3,KeyRound,LockKeyhole,Save,Settings2,ShieldCheck,UserRound,Wallet} from 'lucide-react';
 import {useAuth} from '../AuthContext';
-import {supabase,describeError,fmt,money} from '../lib';
+import {supabase,fmt,money} from '../lib';
 type Preferences={user_id:string;reduced_motion:boolean;compact_cards:boolean;show_tips:boolean};
 const defaults={reduced_motion:false,compact_cards:false,show_tips:true};
 export function MyProfile(){

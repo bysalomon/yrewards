@@ -1,6 +1,6 @@
 import {useEffect,useMemo,useState} from 'react';
 import {Link} from 'react-router-dom';
-import {ArrowRight,BookOpen,CheckCircle2,CirclePlay,Play,ShieldCheck,Video} from 'lucide-react';
+import {ArrowRight,BookOpen,CheckCircle2,CirclePlay,Play,ShieldCheck} from 'lucide-react';
 import {supabase,describeError,youtubeId} from '../lib';
 import {useAuth} from '../AuthContext';
 type Lesson={id:string;module_title:string;title:string;description:string;youtube_url:string;sort_order:number;active:boolean};

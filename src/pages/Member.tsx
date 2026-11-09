@@ -1,5 +1,5 @@
 import {useCallback,useEffect,useState,type FormEvent} from 'react';
-import {Link,Outlet,useLocation,useNavigate,useParams} from 'react-router-dom';
+import {Link,Outlet,useLocation,useNavigate} from 'react-router-dom';
 import {ArrowLeft,ArrowRight,BookOpen,Check,CheckCircle2,Clock3,FileCheck2,Heart,LayoutDashboard,LockKeyhole,LogOut,Menu,Play,Settings2,ShieldAlert,ShieldCheck,UserRound,Video,Wallet as WalletIcon,X} from 'lucide-react';
 import {useAuth} from '../AuthContext';
 import {Brand} from './Landing';
