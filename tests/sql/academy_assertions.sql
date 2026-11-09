@@ -13,9 +13,9 @@ begin
  insert into public.club_courses(title,description,cover_url,sort_order)
  values ('Long Form Learning','A full course','https://images.example.test/cover-9x16.webp',2) returning id into v_second;
  insert into public.club_modules(course_id,title,sort_order)
- values(v_second,'Module 250',250) returning id into v_module;
+ values(v_second,repeat('M',100),250) returning id into v_module;
  insert into public.club_lessons(module_id,module_title,title,description,youtube_url,sort_order)
- values(v_module,'Module 250','Video beyond old 200 limit','Test','https://www.youtube.com/watch?v=abcdefghijk',251)
+ values(v_module,repeat('M',100),'Video beyond old 200 limit','Test','https://www.youtube.com/watch?v=abcdefghijk',251)
  returning id into v_lesson;
  if not exists(select 1 from public.club_lessons where id=v_lesson and sort_order=251)
  then raise exception 'More than 200 lessons per module should be allowed';end if;
