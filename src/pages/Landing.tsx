@@ -4,8 +4,8 @@ import {ArrowRight,ArrowUpRight,BadgeCheck,CheckCircle2,ChevronRight,CircleDolla
 const about:Record<string,[string,string[]]>={
  how:['How it works',[
   'YRewards is an independent, invitation-only market-research community. Participating brands commission feedback on authorised promotional video material.',
-  'Invited members watch the supplied brand creative, then submit a positive or negative evaluation. Our research helps partners understand what works, refine their communication and improve future advertising experiences.',
-  'Rewards are linked to completed, eligible research feedback. The programme is not affiliated with, endorsed by or operated by YouTube. YouTube links, where shown, are for reference only and are not part of paid viewing tasks.'
+  'Invited members examine brand creative and submit an independent positive or negative evaluation. Our research helps partners understand what works, refine their communication and improve future advertising experiences.',
+  'Rewards are linked to completed, eligible independent research feedback. The programme is not affiliated with, endorsed by or operated by YouTube. Embedded YouTube videos are optional, unpaid references; rewards are not based on their views or player engagement.'
  ]],
  invite:['Receive an invitation',[
   'Membership is invitation-only. Each secure invitation link is valid for one new account and expires after seven days.',
@@ -18,7 +18,7 @@ const about:Record<string,[string,string[]]>={
  ]],
  terms:['Terms of participation',[
   'YRewards is an independent market-research service for invited participants aged 18 or older. Members must provide genuine feedback on assigned creative assets.',
-  'Each task shows its reward and viewing requirement in advance. Credits are subject to platform eligibility and fraud-prevention checks. One account per person; do not share invitations or automate activity.',
+  'Each task shows its reward and independent research preparation time in advance. Credits are subject to platform eligibility and fraud-prevention checks. One account per person; do not share invitations or automate activity.',
   'Production launch requires published country-specific programme terms and payment eligibility rules.'
  ]],
  privacy:['Privacy policy',[
@@ -33,7 +33,7 @@ const about:Record<string,[string,string[]]>={
  ]]
 };
 const content:Record<string,string>={how:'How does it work?',invite:'Receive an invitation',payments:'Payment methods'};
-export function Brand(){return <span className="brand"><img src="https://i.imgur.com/Sf3e6O7.png" alt="" onError={e=>e.currentTarget.style.display='none'}/><strong>YV<span>Rewards</span></strong></span>}
+export function Brand(){return <span className="brand"><img src="https://i.imgur.com/Sf3e6O7.png" alt="YVRewards" /></span>}
 export function Landing(){
  const [modal,setModal]=useState<string|null>(null);const [menu,setMenu]=useState(false);
  useEffect(()=>{const f=(e:KeyboardEvent)=>{if(e.key==='Escape'){setModal(null);setMenu(false)}};window.addEventListener('keydown',f);return()=>window.removeEventListener('keydown',f)},[]);
@@ -46,7 +46,7 @@ export function Landing(){
    <button className="mobileMenu" aria-label="Toggle navigation" onClick={()=>setMenu(!menu)}>{menu?<X/>:<Menu/>}</button></header>
    <section className="heroMain"><div className="heroCopy"><span className="eyebrow heroEyebrow"><span className="pulse"/> BRAND RESEARCH · REAL REWARDS</span>
      <h1>Get paid to watch<br/>and <em>review videos.</em></h1>
-     <p>Help brands make better videos. Watch approved promotional content, share your honest feedback and earn rewards for completing independent research assignments.</p>
+     <p>Help brands make better videos. Explore brand creatives, share your honest feedback and earn rewards for completing independent research assignments.</p>
      <div className="heroButtons"><Link className="button btnRed" to="/login">I ALREADY HAVE AN ACCOUNT <ArrowUpRight size={19}/></Link>
      <button className="button btnGlass" onClick={()=>setModal('invite')}>I NEED AN INVITATION <ChevronRight size={18}/></button></div>
      <div className="heroTrust"><span><BadgeCheck size={17}/> Research-driven rewards</span><span><Wallet size={17}/> USD wallet</span><span><ShieldCheck size={17}/> Invite-only access</span></div>

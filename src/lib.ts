@@ -8,7 +8,7 @@ export const fmt=(iso:string)=>new Date(iso).toLocaleDateString('en-GB',{day:'2-
 export const waitLabel=(date:string)=>{const difference=new Date(date).getTime()-Date.now();if(difference<=0)return 'Available now';const h=Math.floor(difference/3600000);const m=Math.ceil((difference%3600000)/60000);return (h>0?h+'h ':'')+m+'m remaining'};
 export const userEmail=(username:string)=>username.trim().toLowerCase()+'@accounts.yrewards.invalid';
 export const youtubeId=(url:string)=>{try{const u=new URL(url);const host=u.hostname.replace(/^www\./,'');if(host==='youtu.be')return /^[\w-]{11}$/.test(u.pathname.slice(1))?u.pathname.slice(1):null;if(host==='youtube.com'||host==='m.youtube.com'){const id=u.pathname.startsWith('/shorts/')?u.pathname.split('/')[2]:u.searchParams.get('v');return id&&/^[\w-]{11}$/.test(id)?id:null;}}catch{/* invalid URL */}return null};
-export type Task={id:string;day_number:number;slot:number;brand_name:string;title:string;youtube_url:string|null;licensed_video_url:string;min_watch_seconds:number;reward_cents:number;active:boolean};
+export type Task={id:string;day_number:number;slot:number;brand_name:string;title:string;youtube_url:string|null;licensed_video_url:string|null;min_watch_seconds:number;reward_cents:number;active:boolean};
 export type Feedback={id:string;user_id:string;video_id:string;day_number:number;cycle_number:number;positive:boolean;reward_cents:number};
 export type Day={cycle_number:number;day_number:number;unlocks_at:string};
 export type Profile={id:string;username:string;full_name:string;created_at:string;status:string};

@@ -4,7 +4,10 @@ import {useAuth} from './AuthContext';
 import {configured} from './lib';
 import {Landing,InfoPage} from './pages/Landing';
 import {Login,Invitation,AdminMfa} from './pages/Auth';
-import {MemberLayout,Dashboard,TaskDay,WalletPage} from './pages/Member';
+import {MemberLayout,Dashboard,WalletPage} from './pages/Member';
+import {ResearchDay} from './pages/Research';
+import {MemberClub} from './pages/Club';
+import {MyProfile,MemberSettings} from './pages/Account';
 import {AdminPage} from './pages/Admin';
 function Protected({adminOnly=false,children}:{adminOnly?:boolean;children:React.ReactNode}){
  const {user,profile,admin,loading}=useAuth();const loc=useLocation();
@@ -23,7 +26,10 @@ export function App(){return <>
   <Route path="/admin/mfa" element={<Protected adminOnly><AdminMfa/></Protected>}/>
   <Route path="/app" element={<Protected><MemberLayout/></Protected>}>
    <Route index element={<Dashboard/>}/>
-   <Route path="tasks/:day" element={<TaskDay/>}/>
+   <Route path="tasks/:day" element={<ResearchDay/>}/>
+   <Route path="club" element={<MemberClub/>}/>
+   <Route path="profile" element={<MyProfile/>}/>
+   <Route path="settings" element={<MemberSettings/>}/>
    <Route path="wallet" element={<WalletPage/>}/>
   </Route>
   <Route path="/admin" element={<Protected adminOnly><MemberLayout adminArea/></Protected>}>

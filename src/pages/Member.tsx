@@ -1,13 +1,13 @@
-import {useCallback,useEffect,useRef,useState,type FormEvent} from 'react';
+import {useCallback,useEffect,useState,type FormEvent} from 'react';
 import {Link,Outlet,useLocation,useNavigate,useParams} from 'react-router-dom';
-import {ArrowLeft,ArrowRight,Check,CheckCircle2,Clock3,FileCheck2,Heart,LayoutDashboard,LockKeyhole,LogOut,Menu,Play,ShieldAlert,ShieldCheck,ThumbsDown,ThumbsUp,Video,Wallet as WalletIcon,X} from 'lucide-react';
+import {ArrowLeft,ArrowRight,BookOpen,Check,CheckCircle2,Clock3,FileCheck2,Heart,LayoutDashboard,LockKeyhole,LogOut,Menu,Play,Settings2,ShieldAlert,ShieldCheck,UserRound,Video,Wallet as WalletIcon,X} from 'lucide-react';
 import {useAuth} from '../AuthContext';
 import {Brand} from './Landing';
-import {supabase,money,fmt,waitLabel,youtubeId,describeError,type Task,type Day,type Feedback,type Profile,type WalletAccount,type PayoutSchedule,type Withdrawal,type Destination,type Identity} from '../lib';
+import {supabase,money,fmt,waitLabel,describeError,type Task,type Day,type Feedback,type Profile,type WalletAccount,type PayoutSchedule,type Withdrawal,type Destination,type Identity} from '../lib';
 type Progress={user_id:string;cycle_number:number;day_number:number;completed_at:string};
 type Watch={video_id:string;cycle_number:number;played_seconds:number};
 type MemberData={profile:Profile|null;wallet:WalletAccount|null;day:Day;tasks:Task[];feedback:Feedback[];completions:Progress[];watches:Watch[]};
-function useMemberData(){
+export function useMemberData(){
  const {user}=useAuth();const [data,setData]=useState<MemberData|null>(null);
  const [loading,setLoading]=useState(true);const [error,setError]=useState('');
  const refresh=useCallback(async()=>{
@@ -35,7 +35,7 @@ export function MemberLayout({adminArea=false}:{adminArea?:boolean}){
  const {profile,admin,signOut}=useAuth();const [open,setOpen]=useState(false);
  const loc=useLocation();const navigate=useNavigate();
  const nav=adminArea?[{path:'/admin',label:'Administration',icon:ShieldCheck},{path:'/app',label:'Member workspace',icon:LayoutDashboard}]:
- [{path:'/app',label:'Dashboard',icon:LayoutDashboard},{path:'/app/wallet',label:'Wallet & payments',icon:WalletIcon}];
+ [{path:'/app',label:'Dashboard',icon:LayoutDashboard},{path:'/app/club',label:'Member Club',icon:BookOpen},{path:'/app/profile',label:'My Profile',icon:UserRound},{path:'/app/settings',label:'Settings',icon:Settings2},{path:'/app/wallet',label:'Wallet & payments',icon:WalletIcon}];
  const leave=async()=>{await signOut();navigate('/')};
  return <div className="workspace">
   {open&&<button className="sideShade" onClick={()=>setOpen(false)} aria-label="Close navigation"/>}
@@ -43,7 +43,7 @@ export function MemberLayout({adminArea=false}:{adminArea?:boolean}){
    <div className="sideBrand"><Link to="/" onClick={()=>setOpen(false)}><Brand/></Link><button className="mobileClose" onClick={()=>setOpen(false)}><X/></button></div>
    <div className="sideCaption">YREWARDS · {adminArea?'STAFF':'MEMBERS'}</div>
    <nav className="sideNav">{nav.map(({path,label,icon:Icon})=><Link key={path} onClick={()=>setOpen(false)} className={loc.pathname===path?'active':''} to={path}><Icon size={19}/>{label}</Link>)}
-    {!adminArea&&<Link className={loc.pathname.startsWith('/app/tasks')?'active':''} to="/app" onClick={()=>setOpen(false)}><Video size={19}/> Video tasks</Link>}
+    {!adminArea&&<Link className={loc.pathname.startsWith('/app/tasks')?'active':''} to="/app" onClick={()=>setOpen(false)}><Video size={19}/> Video Tasks</Link>}
     {admin&&!adminArea&&<Link to="/admin" onClick={()=>setOpen(false)}><ShieldCheck size={19}/> Administration</Link>}
    </nav>
    <div className="sideBottom"><div className="miniProfile"><div className="avatar">{profile?.username?.[0]?.toUpperCase()||'Y'}</div><div><strong>{profile?.full_name||'Member'}</strong><small>@{profile?.username||'member'}</small></div></div>
@@ -69,7 +69,7 @@ export function Dashboard(){
  const completedCount=feedback.length;
  const cards=[{name:'Wallet balance',value:money(wallet?.available_cents),caption:'Approved rewards available',icon:WalletIcon,href:'/app/wallet'},
   {name:'Completed tasks',value:String(completedCount),caption:'Video evaluations submitted',icon:CheckCircle2,href:'/app'},
-  {name:'Hours watched',value:(allWatched/3600).toFixed(2)+' h',caption:'Tracked research playback',icon:Clock3,href:'/app'},
+  {name:'Hours watched',value:(allWatched/3600).toFixed(2)+' h',caption:'Authorised-video playback (not YouTube)',icon:Clock3,href:'/app'},
   {name:'Account level',value:level,caption:'Research contributor status',icon:Heart,href:'/app'}];
  return <><div className="pageHead"><div><span className="eyebrow">YOUR PERSONAL WORKSPACE</span><h1>Welcome back, {profile?.full_name.split(' ')[0]||'member'} <span className="redAccent">.</span></h1>
  <p>Watch approved brand content, share what you think and grow your research rewards.</p></div>
@@ -96,83 +96,7 @@ export function Dashboard(){
   </Link>})}</div>
  <div className="pagination"><button disabled={page===1} onClick={()=>setPage(p=>p-1)}><ArrowLeft size={16}/> Previous</button><span>Page {page} of 4</span>
  <button disabled={page===4} onClick={()=>setPage(p=>p+1)}>Next <ArrowRight size={16}/></button></div>
- <div className="disclaimerPanel"><ShieldAlert size={20}/><p>YRewards is an independent research platform and is not affiliated with YouTube. The reward is for completing eligible research evaluations using authorised brand media, not for generating YouTube views.</p></div>
- </>;
-}
-function VideoReviewCard({task,watched,reviewed,onChanged}:{task:Task;watched:number;reviewed?:Feedback;onChanged:()=>Promise<void>}){
- const video=useRef<HTMLVideoElement|null>(null);
- const [seconds,setSeconds]=useState(watched);const [submitting,setSubmitting]=useState(false);
- const [error,setError]=useState('');const [playerError,setPlayerError]=useState(false);
- const [expanded,setExpanded]=useState(false);
- const ytid=task.youtube_url?youtubeId(task.youtube_url):null;
- const ping=useCallback(async(playing:boolean)=>{
-  const el=video.current;if(!el||reviewed)return;
-  try{
-   const {data,error}=await supabase.rpc('track_video_playback',{
-    p_video:task.id,p_position:el.currentTime,p_playing:playing});
-   if(error)throw error;setSeconds(Number(data||0));
-  }catch(e){setError(describeError(e))}
- },[task.id,reviewed]);
- useEffect(()=>{
-  if(reviewed)return;
-  const timer=window.setInterval(()=>{
-   const el=video.current;
-   if(el&&!el.paused&&!el.ended&&!document.hidden)void ping(true);
-  },3000);
-  const visibility=()=>{if(document.hidden){video.current?.pause();void ping(false)}};
-  document.addEventListener('visibilitychange',visibility);
-  return()=>{window.clearInterval(timer);document.removeEventListener('visibilitychange',visibility)}
- },[ping,reviewed]);
- async function vote(positive:boolean){
-  setSubmitting(true);setError('');
-  try{
-   const {error}=await supabase.rpc('submit_video_feedback',{p_video:task.id,p_positive:positive});
-   if(error)throw error;await onChanged();
-  }catch(e){setError(describeError(e))}finally{setSubmitting(false)}
- }
- const percent=Math.min(100,seconds/task.min_watch_seconds*100);
- return <article className="videoCard">
-  <div className="videoTitle"><div><span className="eyebrow">VIDEO {String(task.slot).padStart(2,'0')} / {task.brand_name.toUpperCase()}</span><h3>{task.title}</h3></div>
-   <span className="rewardChip">+{money(task.reward_cents)}</span></div>
-  <video ref={video} className="researchPlayer" controls controlsList="nodownload" playsInline preload="metadata"
-   src={task.licensed_video_url} onPlay={()=>void ping(true)} onPause={()=>void ping(false)}
-   onEnded={()=>void ping(false)} onError={()=>setPlayerError(true)} aria-label={task.title}/>
-  {playerError&&<p className="error">This brand video cannot be played. Please report the issue to the administrator.</p>}
-  <div className="viewProgress"><div className="progressMeta"><span><Clock3 size={16}/> Watch progress</span><strong>{Math.floor(Math.min(task.min_watch_seconds,seconds))} / {task.min_watch_seconds} sec</strong></div>
-   <div className="progressTrack"><div style={{width:percent+'%'}}/></div>
-   <small>{reviewed?'Your feedback has been submitted.':percent<100?'Watch the required portion of the authorised video to unlock your evaluation.':'You can now rate this video.'}</small></div>
-  {ytid&&<details className="youtubeDetails" open={expanded} onToggle={e=>setExpanded(e.currentTarget.open)}>
-   <summary>Optional YouTube reference preview (not rewarded)</summary>
-   {expanded&&<><p>This optional embedded preview is not tracked and never counts towards a reward.</p>
-    <iframe title="Optional YouTube reference" loading="lazy" allow="encrypted-media; picture-in-picture; fullscreen"
-    referrerPolicy="strict-origin-when-cross-origin" allowFullScreen src={'https://www.youtube-nocookie.com/embed/'+ytid}/></>}</details>}
-  {reviewed?<div className="voted"><CheckCircle2 size={20}/> Feedback recorded — {reviewed.positive?'Positive':'Negative'} · {money(reviewed.reward_cents)} credited</div>:
-  <div className="ratingActions"><button disabled={percent<100||submitting} className="rateBtn negative"
-   onClick={()=>void vote(false)}><ThumbsDown size={20}/> Negative</button>
-   <button disabled={percent<100||submitting} className="rateBtn positive"
-   onClick={()=>void vote(true)}><ThumbsUp size={20}/> Positive</button></div>}
-  {error&&<p className="error" role="alert">{error}</p>}
- </article>;
-}
-export function TaskDay(){
- const {day}=useParams();const target=Number(day);
- const {data,loading,error,refresh}=useMemberData();const navigate=useNavigate();
- if(loading)return <div className="loading">Loading research videos…</div>;
- if(error||!data)return <p className="error">{error||'Could not load task.'}</p>;
- const allowed=data.day.day_number===target && Date.now()>=new Date(data.day.unlocks_at).getTime();
- const done=data.completions.some(c=>c.day_number===target&&(c.cycle_number===data.day.cycle_number||c.cycle_number===data.day.cycle_number-1));
- if(!allowed&&done)return <div className="emptyState"><CheckCircle2 size={34}/><h2>Day {target} complete!</h2><p>All your feedback for this day has been recorded and the rewards have been credited. Your next day unlocks after the 24-hour countdown.</p><Link className="button btnRed" to="/app">Back to daily tasks <ArrowRight size={16}/></Link></div>;
- if(!allowed)return <div className="emptyState"><LockKeyhole size={32}/><h2>This day is not currently available.</h2><p>Each research day unlocks after completing the previous day and waiting 24 hours.</p>
- <button className="button btnRed" onClick={()=>navigate('/app')}>Back to dashboard</button></div>;
- const tasks=data.tasks.filter(t=>t.day_number===target);
- return <><div className="pageHead"><div><Link to="/app" className="backLink"><ArrowLeft size={16}/> Dashboard</Link><span className="eyebrow">CYCLE {data.day.cycle_number} / DAY {String(target).padStart(2,'0')}</span>
- <h1>Today's video research <span className="redAccent">.</span></h1><p>Watch the authorised brand content and share one genuine rating per video.</p></div></div>
- <div className="noticeBanner"><ShieldCheck/><div><strong>Feedback rewards are credited directly.</strong><span>Each evaluation can be submitted once per cycle after the required authorised playback. The next day unlocks 24 hours after completing this one.</span></div></div>
- {!tasks.length?<div className="emptyState"><Video size={30}/><h2>Videos have not been assigned yet</h2><p>An administrator must publish one to three brand research videos for this day.</p></div>:
- <div className="reviewGrid">{tasks.map(t=><VideoReviewCard key={t.id} task={t}
- watched={Number(data.watches.find(w=>w.video_id===t.id&&w.cycle_number===data.day.cycle_number)?.played_seconds||0)}
- reviewed={data.feedback.find(f=>f.video_id===t.id&&f.cycle_number===data.day.cycle_number)}
- onChanged={refresh}/>)}</div>}
+ <div className="disclaimerPanel"><ShieldAlert size={20}/><p>YVRewards is independent of YouTube. YouTube embeds are optional references, and rewards are only for eligible research feedback — never for viewing, liking or other YouTube engagement.</p></div>
  </>;
 }
 export function WalletPage(){
