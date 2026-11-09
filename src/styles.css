@@ -191,3 +191,11 @@ th{color:#a89da0}
 @media(max-width:1250px){.researchLayout{grid-template-columns:minmax(0,1.3fr) minmax(260px,.9fr)}.profileStats{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:1000px){.researchLayout,.settingsColumns{grid-template-columns:1fr}.researchPlaylist{margin-bottom:30px}.profileStats{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:740px){.landingHeader .brand img{width:160px}.sideBrand .brand img{width:156px}.heroCopy h1{font-size:clamp(43px,10vw,66px)}.heroCopy h1 em{font-size:1.13em;letter-spacing:-.065em}.researchMain{padding:15px}.researchMainTitle h2{font-size:20px}.researchOpinion .ratingActions{width:100%}.researchOpinion .rateBtn{flex:1}.playlistHeader{padding:19px}.playlistItem{min-height:76px}.playlistThumb{width:80px}.profileHero{padding:20px}.profileBigAvatar{width:60px;height:60px;font-size:26px}.profileStats{gap:10px}}
+
+.adminVideoPreview{display:flex;gap:13px;align-items:center;background:#171314;border:1px solid #594044;border-radius:11px;padding:10px;margin:7px 0 12px}
+.adminVideoPreview img{width:128px;aspect-ratio:16/9;object-fit:cover;border-radius:7px;background:#000}
+.adminVideoPreview strong{display:block;color:#fff;font-size:12px;margin-bottom:7px}
+.adminVideoPreview small{display:block;font-size:11px;line-height:1.5;color:#b9b3b4}
+.adminVerified,.success,.voted{background:#2a2022;color:#ff888b;border-color:#73383e}
+.reviewRecorded{background:#342629;border-color:#774044;color:#fff}
+@media(max-width:520px){.adminVideoPreview img{width:90px}.adminVideoPreview{gap:9px}.researchLayout{gap:13px}.playlistThumb{width:78px}}
