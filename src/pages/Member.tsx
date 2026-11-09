@@ -160,6 +160,8 @@ export function TaskDay(){
  if(loading)return <div className="loading">Loading research videos…</div>;
  if(error||!data)return <p className="error">{error||'Could not load task.'}</p>;
  const allowed=data.day.day_number===target && Date.now()>=new Date(data.day.unlocks_at).getTime();
+ const done=data.completions.some(c=>c.day_number===target&&(c.cycle_number===data.day.cycle_number||c.cycle_number===data.day.cycle_number-1));
+ if(!allowed&&done)return <div className="emptyState"><CheckCircle2 size={34}/><h2>Day {target} complete!</h2><p>All your feedback for this day has been recorded and the rewards have been credited. Your next day unlocks after the 24-hour countdown.</p><Link className="button btnRed" to="/app">Back to daily tasks <ArrowRight size={16}/></Link></div>;
  if(!allowed)return <div className="emptyState"><LockKeyhole size={32}/><h2>This day is not currently available.</h2><p>Each research day unlocks after completing the previous day and waiting 24 hours.</p>
  <button className="button btnRed" onClick={()=>navigate('/app')}>Back to dashboard</button></div>;
  const tasks=data.tasks.filter(t=>t.day_number===target);
