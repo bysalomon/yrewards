@@ -378,3 +378,6 @@ th{color:#a89da0}
 }
 @media(max-width:380px){.academyAdminCourseList{grid-template-columns:1fr}.pagination .pageNumbers button{width:27px;min-width:27px}.pagination button{padding:7px}}
 @media(prefers-reduced-motion:reduce){.countdownPulse{animation:none}.academyCourseCard{transition:none}}
+
+/* Keep the mobile Day 2 countdown label on a single line. */
+@media(max-width:740px){.dayCountdown>span{white-space:nowrap;flex-wrap:nowrap;gap:6px;font-size:clamp(7px,1.7vw,9px);letter-spacing:.025em}.dayCountdown .countdownPulse{flex-shrink:0}}
