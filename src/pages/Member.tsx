@@ -217,7 +217,7 @@ export function WalletPage(){
  }
  async function withdraw(e:FormEvent){e.preventDefault();setError('');setMessage('');
   const amount=Math.round(Number(cents)*100);
-  if(!Number.isFinite(amount)||amount<100){setError('Enter at least $1.00.');return}
+  if(!Number.isFinite(amount)||amount<25000){setError('Enter at least $250.00.');return}
   const {error}=await supabase.rpc('request_withdrawal',{p_cents:amount,p_destination:selected});
   if(error)setError(error.message);else{setMessage('Withdrawal request received. Your team will process the transfer manually.');setCents('');await reload()}
  }
@@ -243,10 +243,10 @@ export function WalletPage(){
  {isWindow?<>{firstWithdrawal&&!verified?<div className="idVerify"><span className="eyebrow"><FileCheck2 size={16}/> FIRST WITHDRAWAL</span><h3>Identity verification required</h3>
  <p>Before your first withdrawal, submit a government-issued ID for manual verification.</p>
  {pending?<p className="statusNotice">Your document is being reviewed by our team.</p>:<label className="fileUpload">Upload your ID (PDF, JPG or PNG)<input type="file" accept=".pdf,image/png,image/jpeg" onChange={e=>void submitKyc(e)}/></label>}</div>:
- <form className="stackedForm" onSubmit={e=>void withdraw(e)}><label>Amount in USD<input type="number" step="0.01" min="1" max={((wallet?.available_cents||0)/100).toFixed(2)} value={cents} onChange={e=>setCents(e.target.value)} placeholder="0.00" required/></label>
+ <form className="stackedForm" onSubmit={e=>void withdraw(e)}><label>Amount in USD<input type="number" step="0.01" min="250" max={((wallet?.available_cents||0)/100).toFixed(2)} value={cents} onChange={e=>setCents(e.target.value)} placeholder="0.00" required/></label>
  <label>Approved destination<select value={selected} required onChange={e=>setSelected(e.target.value)}><option value="">Select an approved destination</option>
  {destinations.filter(d=>d.verified).map(d=><option value={d.id} key={d.id}>{d.method==='paypal'?'PayPal':'Bank'} — {d.account_details}</option>)}</select></label>
- <button className="button btnRed wide" disabled={!destinations.some(d=>d.verified)||!wallet?.available_cents}>Request withdrawal <ArrowRight size={16}/></button></form>}</>:
+ <button className="button btnRed wide" disabled={!destinations.some(d=>d.verified)||(wallet?.available_cents||0)<25000}>Request withdrawal <ArrowRight size={16}/></button></form>}</>:
  <div className="lockedWithdraw"><LockKeyhole size={26}/><strong>Withdrawal unavailable</strong><p>Your withdrawal request button will become available on your next scheduled date.</p><button className="button btnDark wide" disabled>Withdrawal locked</button></div>}
  </section></div>
  <section className="panel"><h2>Withdrawal history</h2>{withdrawals.length?<div className="responsiveTable"><table><thead><tr><th>Date</th><th>Amount</th><th>Status</th><th>Reference</th></tr></thead><tbody>{withdrawals.map(x=><tr key={x.id}><td>{fmt(x.requested_at)}</td><td>{money(x.amount_cents)}</td><td><span className="statusPill">{x.status}</span></td><td>{x.reference||'—'}</td></tr>)}</tbody></table></div>:<p className="muted">No withdrawal requests yet.</p>}</section>
