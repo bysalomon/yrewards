@@ -1,7 +1,7 @@
 import {useEffect,useState} from 'react';
 import {Link,useParams} from 'react-router-dom';
 import {ArrowRight,ArrowUpRight,BadgeCheck,CheckCircle2,ChevronRight,CircleDollarSign,Menu,ShieldCheck,Star,Wallet,X} from 'lucide-react';
-const about:Record<string,{title:string;copy:string[]}>={
+const about:Record<string,[string,string[]]>={
  how:['How it works',[
   'YRewards is an independent, invitation-only market-research community. Participating brands commission feedback on authorised promotional video material.',
   'Invited members watch the supplied brand creative, then submit a positive or negative evaluation. Our research helps partners understand what works, refine their communication and improve future advertising experiences.',
