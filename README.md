@@ -11,7 +11,7 @@ Independent, invitation-only video research and feedback platform built with Rea
 - Member dashboard: USD wallet, completed feedback, research hours watched and account level. No ranking for users or staff.
 - Thirty daily cards in four pages (8, 8, 8, 6). Day 1 starts unlocked. Completing all active videos on a day unlocks the next day after 24 hours. Completing Day 30 resets the cycle after a further 24 hours.
 - Each day has up to 3 brand-authorised videos. Every video has a measured minimum playback time, positive/negative feedback and its own USD reward. Successful feedback creates one wallet ledger entry and credits the wallet directly.
-- Withdrawals are limited to four registration-anchored UTC dates per month, one request per date. Members registered on day 1 see days 8/15/22/29. End-of-month dates wrap within shorter months; first-month eligibility requires seven calendar days. Button disabled outside eligibility dates; first-withdrawal ID verification shown only when eligible.
+- Withdrawals (minimum $250) are limited to four registration-anchored UTC dates per month, one request per date. Members registered on day 1 see days 8/15/22/29. End-of-month dates wrap within shorter months; first-month eligibility requires seven calendar days. Button disabled outside eligibility dates; first-withdrawal ID verification shown only when eligible.
 - Staff manually review identity documentation and payment destinations, approve withdrawal requests, mark processing, and mark as paid **only after a real external payment**, recording reference and proof note.
 - Admin dashboard (TOTP MFA required): add/edit/disable video tasks, list member activity, review feedback, issue one-use invitations, process identity verification and payouts.
 
