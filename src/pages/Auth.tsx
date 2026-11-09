@@ -17,7 +17,7 @@ export function Login(){
  return <div className="authScreen"><div className="authTop"><Link to="/"><Brand/></Link><Link to="/">Back to home</Link></div>
  <form className="authPanel" onSubmit={e=>void submit(e)}><span className="eyebrow">MEMBER ACCESS</span><h1>Welcome back.</h1><p>Sign in securely to continue your research tasks.</p>
  <label>Username (or administrator email)<input autoComplete="username" value={username} required onChange={e=>setUsername(e.target.value)} placeholder="Username or admin email"/></label>
- <label>Password<input type="password" minLength={12} required autoComplete="current-password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="Your password"/></label>
+ <label>Password<input type="password" required autoComplete="current-password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="Your password"/></label>
  {error&&<p className="error" role="alert">{error}</p>}<button className="button btnRed wide" disabled={busy}>{busy?'Signing in…':'Sign in'} <ArrowRight size={17}/></button>
  <p className="finePrint">Access is available to invited members only. No public registration.</p>
  <Link className="muted" to="/invite">How do invitations work?</Link></form></div>
