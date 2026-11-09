@@ -1,0 +1,6 @@
+# YRewards must use its own Supabase project ref. Do not copy VoiceTask project IDs.
+[functions.accept-invite]
+verify_jwt = false
+
+[functions.create-invite]
+verify_jwt = true
