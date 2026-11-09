@@ -107,13 +107,14 @@ export function CourseView(){
  const lessons=courseLessons(data,course.id);
  const current=lessons.find(l=>l.id===picked)||lessons.find(l=>!data.done.has(l.id))||lessons[0];
  const p=progress(data,course.id);
+ const completedLessons=data.done;
  async function markCompleted(){
-  if(!user||!current||data.done.has(current.id)||busy)return;
+  if(!user||!current||completedLessons.has(current.id)||busy)return;
   setBusy(true);setMessage('');
   const {error}=await supabase.from('club_progress').insert({user_id:user.id,lesson_id:current.id});
   if(error)setMessage(error.message);
   else{
-   const next=lessons.find(l=>l.id!==current.id&&!data.done.has(l.id));
+   const next=lessons.find(l=>l.id!==current.id&&!completedLessons.has(l.id));
    setPicked(next?.id||current.id);await refresh();
   }
   setBusy(false);
